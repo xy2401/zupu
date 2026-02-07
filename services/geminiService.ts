@@ -2,11 +2,19 @@
 import { GoogleGenAI } from "@google/genai";
 import { Person } from "../types";
 
-// Initialize the Google GenAI client using the API key from environment variables.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 export async function generateBiography(person: Person, familyName: string, origin: string): Promise<string> {
+  // 检查 API KEY 是否存在，避免浏览器端初始化报错导致整个应用崩溃
+  const apiKey = process.env.API_KEY;
+  
+  if (!apiKey || apiKey === 'undefined' || apiKey === '') {
+    console.warn("Gemini API Key is not configured. AI features are disabled.");
+    return "系统未配置 AI 接口（API_KEY），无法自动生成传记。请联系管理员在 GitHub Secrets 中配置 API_KEY，或手动完善成员生平。";
+  }
+
   try {
+    // 仅在调用时初始化，确保应用在没有 Key 的情况下也能正常加载 UI
+    const ai = new GoogleGenAI({ apiKey });
+
     const prompt = `
       请为以下这位家族成员撰写一段富有文学色彩、感人至深的生平传记：
       姓名：${familyName}${person.name}
@@ -22,7 +30,6 @@ export async function generateBiography(person: Person, familyName: string, orig
       4. 字数约200-300字。
     `;
 
-    // Generate content using the Gemini 3 Flash model.
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: prompt,
@@ -32,10 +39,9 @@ export async function generateBiography(person: Person, familyName: string, orig
       }
     });
 
-    // Access the generated text directly from the response object.
-    return response.text || "未能生成传记，请稍后重试。";
+    return response.text || "未能生成传记内容。";
   } catch (error) {
     console.error("Gemini API Error:", error);
-    return "生成生平失败，请手动输入或检查网络。";
+    return "AI 服务请求失败，请检查网络或 API 状态。目前您可以先手动输入相关资料。";
   }
 }
