@@ -26,11 +26,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          # 移除了 cache: 'npm'，因为仓库中没有提交 package-lock.json 文件。
-          # 这样可以避免 "Dependencies lock file is not found" 错误。
 
       - name: Install dependencies
-        run: npm install
+        run: npm install --no-package-lock
 
       - name: Build
         run: npm run build
