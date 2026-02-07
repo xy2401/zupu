@@ -1,0 +1,7 @@
+{
+  "name": "Heritage Ledger - Modern Chinese Genealogy",
+  "description": "A high-end family tree and genealogy management platform inspired by zupu.cn, featuring D3-powered tree visualizations and AI-assisted historical biography generation.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
